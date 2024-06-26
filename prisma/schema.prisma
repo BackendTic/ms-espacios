@@ -13,18 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TipoImplemento{
+enum TipoEspacio{
   FUTBOL
   BASKET
   VOLEY
-  TENNIS
-  PING_PONG
 }
 
-model Implemento{
+model Espacio{
   id String @id @default(uuid())
   nombre String
-  disciplina TipoImplemento
+  disciplina TipoEspacio
   disponible Boolean @default(true)
   estado Boolean @default(true)
   imagen String @default("")
