@@ -17,6 +17,10 @@ enum TipoEspacio{
   FUTBOL
   BASKET
   VOLEY
+  TENNIS
+  FUTBOL_SALA
+  OTROS
+  ATLETISMO
 }
 
 model Espacio{

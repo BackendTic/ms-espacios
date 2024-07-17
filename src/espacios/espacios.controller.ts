@@ -3,6 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { EspaciosService } from './espacios.service';
 import { CreateEspacioDto } from './dto/create-espacio.dto';
 import { UpdateEspacioDto } from './dto/update-espacio.dto';
+import { TipoEspacio } from '@prisma/client';
 
 @Controller()
 export class EspaciosController {
@@ -23,6 +24,11 @@ export class EspaciosController {
   @MessagePattern('findAllEspacios')
   findAll() {
     return this.espaciosService.findAll();
+  }
+
+  @MessagePattern('findSpacesDiscipline')
+  findSpacesDiscipline(disciplina: TipoEspacio) {
+    return this.espaciosService.findSpacesDiscipline(disciplina);
   }
 
   @MessagePattern('findOneEspacio')

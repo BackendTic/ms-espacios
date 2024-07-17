@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateEspacioDto } from './dto/create-espacio.dto';
 import { UpdateEspacioDto } from './dto/update-espacio.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TipoEspacio } from '@prisma/client';
+import { RESERVAS_SERVICE } from 'src/config/services';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class EspaciosService extends PrismaClient implements OnModuleInit{
@@ -11,6 +13,13 @@ export class EspaciosService extends PrismaClient implements OnModuleInit{
   async onModuleInit() {
     await this.$connect()
     this.logger.log('Database conected')
+  }
+
+  constructor(
+    @Inject(RESERVAS_SERVICE)
+    private readonly reservasClient: ClientProxy,
+  ){
+    super()
   }
 
   create(createEspacioDto: CreateEspacioDto) {
@@ -25,6 +34,12 @@ export class EspaciosService extends PrismaClient implements OnModuleInit{
     });
   }
 
+  findSpacesDiscipline(Disciplina: TipoEspacio) {
+    return this.espacio.findMany({
+      where:{disciplina: Disciplina, estado:true}
+    });
+  }
+
   async findOne(id: string) {
     const espacio = await this.espacio.findUnique({
       where: { id, estado:true  },
@@ -32,11 +47,13 @@ export class EspaciosService extends PrismaClient implements OnModuleInit{
     return espacio
   }
 
-  update(id: string, updateEspacioDto: UpdateEspacioDto) {
-    return this.espacio.update({
+  async update(id: string, updateEspacioDto: UpdateEspacioDto) {
+    const espacioUpdate= await this.espacio.update({
       where: { id },
       data: updateEspacioDto,
     });
+    await this.reservasClient.send('changeNameSpaceTimeSlot',{espacioId:espacioUpdate.id, nombre:espacioUpdate.nombre}).toPromise()
+    return espacioUpdate 
   }
 
  remove(id: string) {
