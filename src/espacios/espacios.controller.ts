@@ -12,7 +12,7 @@ export class EspaciosController {
   @MessagePattern('createEspacio')
   create(@Payload() createEspacioDto: any) {
     try {
-      console.log(createEspacioDto);
+      //console.log(createEspacioDto);
       // return createEspacioDto
       return this.espaciosService.create(createEspacioDto);
     } catch (error) {
